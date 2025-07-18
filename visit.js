@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 exports.handler = async function(event, context) {
-  const API_KEY = 'VKJWBCOHQYK8HP4JQPIP0TA9ICRHFVXQRA5K4Y3WW56MKNJA80FKMIGL6TS5ZCKYLBM01K2SZCSEWPRA';
+  const API_KEY = 'VKJWBCOHQYK8HP4JQPIP0TA9ICRHFVXQRA5K4Y3WW56MKNJA80FKMIGL6TS5ZCKYLBM01K2SZCSEWPRA'; // استبدل بمفتاحك الفعلي
   const TARGET_URL = 'https://btc240.netlify.app/';
   const waitTime = Math.floor(Math.random() * 21) + 20;
 
@@ -25,20 +25,11 @@ exports.handler = async function(event, context) {
   try {
     const response = await axios.get('https://app.scrapingbee.com/api/v1/', { params, timeout: 150000 });
     if (response.data.includes('ad-') || response.data.includes('advert')) {
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ message: 'Ad loaded successfully' })
-      };
+      return { statusCode: 200, body: JSON.stringify({ message: 'Ad loaded successfully' }) };
     } else {
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ message: 'Ad not loaded', response: response.data.substring(0, 500) })
-      };
+      return { statusCode: 200, body: JSON.stringify({ message: 'Ad not loaded' }) };
     }
   } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: error.message })
-    };
+    return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
   }
 };
