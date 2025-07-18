@@ -1,56 +1,73 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-    <meta charset="UTF-8">
-    <title>التحكم في السكربت</title>
-    <style>body { text-align: center; padding: 50px; }</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>التحكم في السكربت</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background-color: #f4f4f4; }
+    button { padding: 10px 20px; margin: 10px; font-size: 16px; cursor: pointer; }
+    #status { margin-top: 20px; font-weight: bold; color: #333; }
+  </style>
 </head>
 <body>
-    <h1>التحكم في الزيارات</h1>
-    <button id="startBtn">تشغيل</button>
-    <button id="stopBtn" disabled>إيقاف</button>
-    <div id="status">الحالة: متوقف</div>
-    <script>
-        let isRunning = false;
-        let visitCount = 0;
-        const maxVisits = 20;
+  <h1>التحكم في زيارات الموقع</h1>
+  <button id="startBtn">تشغيل</button>
+  <button id="stopBtn" disabled>إيقاف</button>
+  <div id="status">الحالة: متوقف</div>
 
-        document.getElementById('startBtn').addEventListener('click', () => {
-            if (!isRunning) {
-                isRunning = true;
-                document.getElementById('startBtn').disabled = true;
-                document.getElementById('stopBtn').disabled = false;
-                runVisits();
-            }
-        });
+  <script>
+    let isRunning = false;
+    let visitCount = 0;
+    const maxVisits = 20;
 
-        document.getElementById('stopBtn').addEventListener('click', () => {
-            isRunning = false;
-            document.getElementById('startBtn').disabled = false;
-            document.getElementById('stopBtn').disabled = true;
-            document.getElementById('status').textContent = `الحالة: توقف (تم ${visitCount} زيارة)`;
-        });
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const statusDiv = document.getElementById('status');
 
-        async function runVisits() {
-            if (!isRunning || visitCount >= maxVisits) {
-                isRunning = false;
-                document.getElementById('startBtn').disabled = false;
-                document.getElementById('stopBtn').disabled = true;
-                return;
-            }
-            try {
-                const response = await fetch('/.netlify/functions/not');
-                const result = await response.json();
-                document.getElementById('status').textContent = `الحالة: ${result.message} (زيارة ${visitCount + 1})`;
-                visitCount++;
-                if (isRunning && visitCount < maxVisits) {
-                    setTimeout(runVisits, Math.random() * 60000 + 60000); // 60-120 ثانية
-                }
-            } catch (error) {
-                document.getElementById('status').textContent = `خطأ: ${error.message}`;
-                isRunning = false;
-            }
+    async function runVisits() {
+      if (!isRunning || visitCount >= maxVisits) {
+        stopScript();
+        return;
+      }
+      try {
+        const response = await fetch('/.netlify/functions/not');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const result = await response.json(); // تحليل JSON
+        statusDiv.textContent = `الحالة: ${result.body ? JSON.parse(result.body).message : 'No message'} (زيارة ${visitCount + 1})`;
+        visitCount++;
+        if (isRunning && visitCount < maxVisits) {
+          const waitTime = Math.random() * 60000 + 60000; // 60-120 ثانية
+          setTimeout(runVisits, waitTime);
+        } else {
+          stopScript();
         }
-    </script>
+      } catch (error) {
+        statusDiv.textContent = `خطأ: ${error.message}`;
+        stopScript();
+      }
+    }
+
+    function startScript() {
+      if (!isRunning) {
+        isRunning = true;
+        visitCount = 0;
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        statusDiv.textContent = 'الحالة: بدء التشغيل...';
+        runVisits();
+      }
+    }
+
+    function stopScript() {
+      isRunning = false;
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      statusDiv.textContent = `الحالة: توقف (تم تنفيذ ${visitCount} زيارة)`;
+    }
+
+    startBtn.addEventListener('click', startScript);
+    stopBtn.addEventListener('click', stopScript);
+  </script>
 </body>
 </html>
