@@ -1,7 +1,8 @@
 const axios = require('axios');
 
 exports.handler = async function(event, context) {
-  const API_KEY = process.env.API_KEY || 'VKJWBCOHQYK8HP4JQPIP0TA9ICRHFVXQRA5K4Y3WW56MKNJA80FKMIGL6TS5ZCKYLBM01K2SZCSEWPRA'; // استخدم النسخة الاحتياطية للاختبار
+  const API_KEY = process.env.API_KEY || 'YOUR_API_KEY'; // استخدم النسخة الاحتياطية للاختبار
+  console.log('API_KEY loaded:', API_KEY ? 'Found' : 'Not found');
   const TARGET_URL = 'https://btc240.netlify.app/';
   const waitTime = Math.floor(Math.random() * 21) + 20;
 
@@ -23,15 +24,16 @@ exports.handler = async function(event, context) {
   };
 
   try {
-    console.log('Sending request to ScrapingBee with API_KEY:', API_KEY); // تسجيل للتحقق
-    const response = await axios.get('https://app.scrapingbee.com/api/v1/', { params, timeout: 10000 }); // تقليل المهلة للاختبار
+    console.log('Sending request to ScrapingBee with params:', params);
+    const response = await axios.get('https://app.scrapingbee.com/api/v1/', { params, timeout: 10000 });
+    console.log('Response received, checking for ads...');
     const result = {
       statusCode: 200,
       body: JSON.stringify({
         message: response.data.includes('ad-') || response.data.includes('advert')
           ? 'Ad loaded successfully'
           : 'Ad not loaded',
-        dataSnippet: response.data.substring(0, 200) // جزء صغير من البيانات
+        dataSnippet: response.data.substring(0, 200)
       })
     };
     return result;
