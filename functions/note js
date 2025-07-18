@@ -1,7 +1,8 @@
 const axios = require('axios');
 
 exports.handler = async function(event, context) {
-  const API_KEY = 'VKJWBCOHQYK8HP4JQPIP0TA9ICRHFVXQRA5K4Y3WW56MKNJA80FKMIGL6TS5ZCKYLBM01K2SZCSEWPRA'; // استبدل بمفتاحك الفعلي
+  // استخدام متغير بيئي لمفتاح API (يجب إضافته في إعدادات Netlify)
+  const API_KEY = process.env.API_KEY || 'YOUR_API_KEY'; // النسخة الاحتياطية إذا لم يكن المتغير موجودًا
   const TARGET_URL = 'https://btc240.netlify.app/';
   const waitTime = Math.floor(Math.random() * 21) + 20;
 
@@ -24,12 +25,23 @@ exports.handler = async function(event, context) {
 
   try {
     const response = await axios.get('https://app.scrapingbee.com/api/v1/', { params, timeout: 150000 });
-    if (response.data.includes('ad-') || response.data.includes('advert')) {
-      return { statusCode: 200, body: JSON.stringify({ message: 'Ad loaded successfully' }) };
-    } else {
-      return { statusCode: 200, body: JSON.stringify({ message: 'Ad not loaded' }) };
-    }
+    const result = {
+      statusCode: 200,
+      body: JSON.stringify({
+        message: response.data.includes('ad-') || response.data.includes('advert') 
+          ? 'Ad loaded successfully' 
+          : 'Ad not loaded',
+        data: response.data.substring(0, 500) // إرجاع جزء من البيانات للتأكد
+      })
+    };
+    return result;
   } catch (error) {
-    return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+    console.error('Error in function:', error.message);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        error: `Failed to process request: ${error.message}`
+      })
+    };
   }
 };
