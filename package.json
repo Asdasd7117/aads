@@ -1,7 +1,7 @@
 {
   "name": "my-netlify-script",
   "version": "1.0.0",
-  "description": "A simple Netlify function to simulate website visits",
+  "description": "A Netlify function to simulate website visits",
   "main": "index.js",
   "scripts": {
     "start": "echo 'No start script needed for Netlify Functions'"
