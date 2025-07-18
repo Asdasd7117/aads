@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>التحكم في السكربت</title>
+    <style>body { text-align: center; padding: 50px; }</style>
+</head>
+<body>
+    <h1>التحكم في الزيارات</h1>
+    <button id="startBtn">تشغيل</button>
+    <button id="stopBtn" disabled>إيقاف</button>
+    <div id="status">الحالة: متوقف</div>
+    <script>
+        let isRunning = false;
+        let visitCount = 0;
+        const maxVisits = 20;
+
+        document.getElementById('startBtn').addEventListener('click', () => {
+            if (!isRunning) {
+                isRunning = true;
+                document.getElementById('startBtn').disabled = true;
+                document.getElementById('stopBtn').disabled = false;
+                runVisits();
+            }
+        });
+
+        document.getElementById('stopBtn').addEventListener('click', () => {
+            isRunning = false;
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+            document.getElementById('status').textContent = `الحالة: توقف (تم ${visitCount} زيارة)`;
+        });
+
+        async function runVisits() {
+            if (!isRunning || visitCount >= maxVisits) {
+                isRunning = false;
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('stopBtn').disabled = true;
+                return;
+            }
+            try {
+                const response = await fetch('/.netlify/functions/not');
+                const result = await response.json();
+                document.getElementById('status').textContent = `الحالة: ${result.message} (زيارة ${visitCount + 1})`;
+                visitCount++;
+                if (isRunning && visitCount < maxVisits) {
+                    setTimeout(runVisits, Math.random() * 60000 + 60000); // 60-120 ثانية
+                }
+            } catch (error) {
+                document.getElementById('status').textContent = `خطأ: ${error.message}`;
+                isRunning = false;
+            }
+        }
+    </script>
+</body>
+</html>
