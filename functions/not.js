@@ -5,25 +5,22 @@ exports.handler = async function(event, context) {
   console.log('Function started, API_KEY:', API_KEY ? 'Found' : 'Not found');
 
   const TARGET_URL = 'https://btc240.netlify.app/';
-  const waitTime = Math.floor(Math.random() * 2) + 2;
-
   const jsScenario = {
     instructions: [
-      { wait: 2 },
-      { scroll_y: 200 }
+      { wait: 1 } // تقليل الانتظار إلى 1 ثانية
     ]
   };
 
   const params = {
     api_key: API_KEY,
     url: TARGET_URL,
-    render_js: true,
+    render_js: false, // تعطيل التنفيذ لتقليل الوقت
     js_scenario: JSON.stringify(jsScenario)
   };
 
   try {
     console.log('Sending request to ScrapingBee with params:', JSON.stringify(params));
-    const response = await axios.get('https://app.scrapingbee.com/api/v1/', { params, timeout: 4000 });
+    const response = await axios.get('https://app.scrapingbee.com/api/v1/', { params, timeout: 3000 }); // تقليل إلى 3 ثوانٍ
     console.log('Response received, status:', response.status);
     const result = {
       statusCode: 200,
