@@ -2,7 +2,7 @@ const axios = require('axios');
 
 exports.handler = async function(event, context) {
   // استخدام متغير بيئي لمفتاح API (يجب إضافته في إعدادات Netlify)
-  const API_KEY = process.env.API_KEY || 'YOUR_API_KEY'; // النسخة الاحتياطية إذا لم يكن المتغير موجودًا
+  const API_KEY = process.env.API_KEY || 'VKJWBCOHQYK8HP4JQPIP0TA9ICRHFVXQRA5K4Y3WW56MKNJA80FKMIGL6TS5ZCKYLBM01K2SZCSEWPRA'; // النسخة الاحتياطية إذا لم يكن المتغير موجودًا
   const TARGET_URL = 'https://btc240.netlify.app/';
   const waitTime = Math.floor(Math.random() * 21) + 20;
 
