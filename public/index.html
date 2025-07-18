@@ -32,9 +32,12 @@
       }
       try {
         const response = await fetch('/.netlify/functions/not');
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const result = await response.json(); // تحليل JSON
-        statusDiv.textContent = `الحالة: ${result.body ? JSON.parse(result.body).message : 'No message'} (زيارة ${visitCount + 1})`;
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const result = await response.json();
+        const body = JSON.parse(result.body); // استخراج الرسالة من body
+        statusDiv.textContent = `الحالة: ${body.message} (زيارة ${visitCount + 1})`;
         visitCount++;
         if (isRunning && visitCount < maxVisits) {
           const waitTime = Math.random() * 60000 + 60000; // 60-120 ثانية
