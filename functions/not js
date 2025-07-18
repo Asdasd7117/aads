@@ -1,18 +1,22 @@
 const axios = require('axios');
 
 exports.handler = async function(event, context) {
-  const API_KEY = process.env.API_KEY || 'VKJWBCOHQYK8HP4JQPIP0TA9ICRHFVXQRA5K4Y3WW56MKNJA80FKMIGL6TS5ZCKYLBM01K2SZCSEWPRA'; // استخدم النسخة الاحتياطية للاختبار
-  console.log('API_KEY loaded:', API_KEY ? 'Found' : 'Not found');
+  const API_KEY = process.env.API_KEY;
+  console.log('Function started, API_KEY:', API_KEY ? 'Found' : 'Not found');
+  if (!API_KEY) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'API_KEY is missing' })
+    };
+  }
+
   const TARGET_URL = 'https://btc240.netlify.app/';
-  const waitTime = Math.floor(Math.random() * 21) + 20;
+  const waitTime = Math.floor(Math.random() * 5) + 5; // تقليل وقت الانتظار للاختبار
 
   const jsScenario = {
     instructions: [
-      { wait: 10 },
-      { wait: waitTime },
-      { scroll_y: 500 },
-      { scroll_y: 1000 },
-      { wait: 5 }
+      { wait: 5 }, // تقليل الانتظار
+      { scroll_y: 500 }
     ]
   };
 
@@ -24,9 +28,9 @@ exports.handler = async function(event, context) {
   };
 
   try {
-    console.log('Sending request to ScrapingBee with params:', params);
-    const response = await axios.get('https://app.scrapingbee.com/api/v1/', { params, timeout: 10000 });
-    console.log('Response received, checking for ads...');
+    console.log('Sending request to ScrapingBee with params:', JSON.stringify(params));
+    const response = await axios.get('https://app.scrapingbee.com/api/v1/', { params, timeout: 5000 }); // تقليل المهلة
+    console.log('Response received, status:', response.status);
     const result = {
       statusCode: 200,
       body: JSON.stringify({
