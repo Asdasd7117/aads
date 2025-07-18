@@ -33,10 +33,10 @@
       try {
         const response = await fetch('/.netlify/functions/not');
         if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+          throw new Error(`HTTP error! Status: ${response.status}, Text: ${await response.text()}`);
         }
         const result = await response.json();
-        const body = JSON.parse(result.body); // استخراج الرسالة من body
+        const body = JSON.parse(result.body);
         statusDiv.textContent = `الحالة: ${body.message} (زيارة ${visitCount + 1})`;
         visitCount++;
         if (isRunning && visitCount < maxVisits) {
@@ -47,6 +47,7 @@
         }
       } catch (error) {
         statusDiv.textContent = `خطأ: ${error.message}`;
+        console.log('Fetch error details:', error); // تسجيل في وحدة التحكم
         stopScript();
       }
     }
